@@ -23,7 +23,7 @@ function requireAuth(req, res, next) {
 
 app.get("/healthz", (_req, res) => res.json({ ok: true }));
 
-// Pool counts (no auth — used by the claim form)
+// Pool counts (no auth — used by the launch form)
 app.get("/api/pool/counts", async (_req, res) => {
   try {
     const counts = await db.countByStatus();
@@ -33,7 +33,7 @@ app.get("/api/pool/counts", async (_req, res) => {
   }
 });
 
-// List claimed agents (no auth — used by the page)
+// List launched agents (no auth — used by the page)
 app.get("/api/pool/agents", async (_req, res) => {
   try {
     const agents = await db.listClaimed();
@@ -43,7 +43,7 @@ app.get("/api/pool/agents", async (_req, res) => {
   }
 });
 
-// Kill all claimed instances (returns list of IDs so frontend can track)
+// Kill all launched instances (returns list of IDs so frontend can track)
 app.delete("/api/pool/instances", requireAuth, async (_req, res) => {
   try {
     const agents = await db.listClaimed();
@@ -53,7 +53,7 @@ app.delete("/api/pool/instances", requireAuth, async (_req, res) => {
   }
 });
 
-// Kill a claimed instance
+// Kill a launched instance
 app.delete("/api/pool/instances/:id", requireAuth, async (req, res) => {
   try {
     await pool.killInstance(req.params.id);
@@ -390,12 +390,12 @@ app.get("/", (_req, res) => {
       <div class="status-pills">
         <div class="status-pill idle"><span class="dot"></span><span id="s-idle">-</span> idle</div>
         <div class="status-pill provisioning"><span class="dot"></span><span id="s-prov">-</span> starting</div>
-        <div class="status-pill claimed"><span class="dot"></span><span id="s-claim">-</span> claimed</div>
+        <div class="status-pill claimed"><span class="dot"></span><span id="s-claim">-</span> live</div>
       </div>
     </header>
 
     <div class="card">
-      <h3>Claim an Agent</h3>
+      <h3>Launch an Agent</h3>
       <div id="unavailable" class="unavailable-msg" style="display:none">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="1.5">
           <circle cx="12" cy="12" r="10" stroke-dasharray="31.4" stroke-dashoffset="10">
@@ -413,7 +413,7 @@ app.get("/", (_req, res) => {
           <label class="setting-label" for="instructions">Instructions</label>
           <textarea id="instructions" name="instructions" class="setting-input" placeholder="You are a helpful trip planner for Tokyo..." required></textarea>
         </div>
-        <button type="submit" id="btn" class="btn-primary" disabled>Claim Instance</button>
+        <button type="submit" id="btn" class="btn-primary" disabled>Launch Agent</button>
       </form>
     </div>
     <div class="error-message" id="error"></div>
@@ -490,7 +490,7 @@ app.get("/", (_req, res) => {
 
     function renderFeed(){
       if(!agentsCache.length){
-        feed.innerHTML='<div class="empty-state">No active agents yet. Claim one above.</div>';
+        feed.innerHTML='<div class="empty-state">No active agents yet. Launch one above.</div>';
         return;
       }
       feed.innerHTML=agentsCache.map(function(a){
@@ -569,25 +569,25 @@ app.get("/", (_req, res) => {
       }
     }
 
-    // Claim form
+    // Launch form
     var f=document.getElementById('f'),errorEl=document.getElementById('error');
     f.onsubmit=async function(e){
       e.preventDefault();
       var agentName=f.name.value.trim();
-      claiming=true;btn.disabled=true;btn.textContent='Claiming...';errorEl.style.display='none';
+      claiming=true;btn.disabled=true;btn.textContent='Launching...';errorEl.style.display='none';
       try{
         var res=await fetch('/api/pool/claim',{method:'POST',headers:authHeaders,
           body:JSON.stringify({agentId:agentName,instructions:f.instructions.value.trim()})
         });
         var data=await res.json();
-        if(!res.ok)throw new Error(data.error||'Claim failed');
+        if(!res.ok)throw new Error(data.error||'Launch failed');
         f.reset();
         showQr(agentName||data.instanceId,data.inviteUrl);
         refreshFeed();
       }catch(err){
         errorEl.textContent=err.message;
         errorEl.style.display='block';
-      }finally{claiming=false;btn.textContent='Claim Instance';refreshStatus();}
+      }finally{claiming=false;btn.textContent='Launch Agent';refreshStatus();}
     };
 
     // Replenish
@@ -641,8 +641,7 @@ app.get("/api/pool/status", requireAuth, async (_req, res) => {
   }
 });
 
-// Claim an idle instance and provision it with instructions.
-// This is what the webapp calls.
+// Launch an agent — claim an idle instance and provision it with instructions.
 app.post("/api/pool/claim", requireAuth, async (req, res) => {
   const { agentId, instructions } = req.body || {};
   if (!instructions || typeof instructions !== "string") {
@@ -661,7 +660,7 @@ app.post("/api/pool/claim", requireAuth, async (req, res) => {
     }
     res.json(result);
   } catch (err) {
-    console.error("[api] Claim failed:", err);
+    console.error("[api] Launch failed:", err);
     res.status(500).json({ error: err.message });
   }
 });

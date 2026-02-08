@@ -108,14 +108,14 @@ export async function replenish() {
   return results;
 }
 
-// Provision an idle instance with instructions.
+// Launch an agent — provision an idle instance with instructions.
 // Returns { inviteUrl, qrDataUrl, conversationId } or null if no idle instances.
 export async function provision(agentId, instructions) {
   // 1. Atomically claim an idle instance
   const instance = await db.claimOne(agentId);
   if (!instance) return null;
 
-  console.log(`[pool] Claiming ${instance.id} for ${agentId}`);
+  console.log(`[pool] Launching ${instance.id} for ${agentId}`);
 
   // 2. Call /pool/provision on the instance
   const res = await fetch(`${instance.railway_url}/pool/provision`, {
