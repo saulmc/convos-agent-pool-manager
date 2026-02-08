@@ -28,7 +28,7 @@ app.get("/", (_req, res) => {
   res.type("html").send(`<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Concierge Pool</title>
+<title>Convos Agent Pool</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:system-ui,sans-serif;background:#0f0f0f;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center}
@@ -49,7 +49,7 @@ app.get("/", (_req, res) => {
 </style>
 </head><body>
 <div class="card">
-  <h1>Claim a Concierge</h1>
+  <h1>Claim a Convos Agent</h1>
   <form id="f">
     <label for="name">Name</label>
     <input id="name" name="name" placeholder="e.g. tokyo-trip-planner" required>
@@ -68,7 +68,7 @@ f.onsubmit=async e=>{
     const res=await fetch('/api/pool/claim',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer ${POOL_API_KEY}'},
-      body:JSON.stringify({conciergeId:f.name.value.trim(),instructions:f.instructions.value.trim()})
+      body:JSON.stringify({agentId:f.name.value.trim(),instructions:f.instructions.value.trim()})
     });
     const data=await res.json();
     if(!res.ok)throw new Error(data.error||'Claim failed');
@@ -100,16 +100,16 @@ app.get("/api/pool/status", requireAuth, async (_req, res) => {
 // Claim an idle instance and provision it with instructions.
 // This is what the webapp calls.
 app.post("/api/pool/claim", requireAuth, async (req, res) => {
-  const { conciergeId, instructions } = req.body || {};
+  const { agentId, instructions } = req.body || {};
   if (!instructions || typeof instructions !== "string") {
     return res.status(400).json({ error: "instructions (string) is required" });
   }
-  if (!conciergeId || typeof conciergeId !== "string") {
-    return res.status(400).json({ error: "conciergeId (string) is required" });
+  if (!agentId || typeof agentId !== "string") {
+    return res.status(400).json({ error: "agentId (string) is required" });
   }
 
   try {
-    const result = await pool.provision(conciergeId, instructions);
+    const result = await pool.provision(agentId, instructions);
     if (!result) {
       return res.status(503).json({
         error: "No idle instances available. Try again in a few minutes.",

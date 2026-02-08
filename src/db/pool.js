@@ -15,12 +15,12 @@ export async function markIdle(id, railwayUrl) {
   `;
 }
 
-export async function claimOne(conciergeId) {
+export async function claimOne(agentId) {
   // Atomically grab one idle instance
   const result = await sql`
     UPDATE pool_instances
     SET status = 'claimed',
-        claimed_by_concierge_id = ${conciergeId},
+        claimed_by = ${agentId},
         claimed_at = NOW(),
         updated_at = NOW()
     WHERE id = (

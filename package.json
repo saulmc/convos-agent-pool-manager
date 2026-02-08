@@ -1,5 +1,5 @@
 {
-  "name": "concierge-pool-manager",
+  "name": "convos-agent-pool-manager",
   "private": true,
   "type": "module",
   "engines": {

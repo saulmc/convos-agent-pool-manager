@@ -21,7 +21,7 @@ function instanceEnvVars() {
 // Create a single new Railway service and register it in the DB.
 export async function createInstance() {
   const id = nanoid(12);
-  const name = `concierge-${id}`;
+  const name = `convos-agent-${id}`;
 
   console.log(`[pool] Creating instance ${name}...`);
 
@@ -110,12 +110,12 @@ export async function replenish() {
 
 // Provision an idle instance with instructions.
 // Returns { inviteUrl, qrDataUrl, conversationId } or null if no idle instances.
-export async function provision(conciergeId, instructions) {
+export async function provision(agentId, instructions) {
   // 1. Atomically claim an idle instance
-  const instance = await db.claimOne(conciergeId);
+  const instance = await db.claimOne(agentId);
   if (!instance) return null;
 
-  console.log(`[pool] Claiming ${instance.id} for concierge ${conciergeId}`);
+  console.log(`[pool] Claiming ${instance.id} for ${agentId}`);
 
   // 2. Call /pool/provision on the instance
   const res = await fetch(`${instance.railway_url}/pool/provision`, {
@@ -142,8 +142,8 @@ export async function provision(conciergeId, instructions) {
 
   // 4. Rename the Railway service so it's identifiable in the dashboard
   try {
-    await railway.renameService(instance.railway_service_id, `concierge-${conciergeId}`);
-    console.log(`[pool] Renamed ${instance.id} → concierge-${conciergeId}`);
+    await railway.renameService(instance.railway_service_id, `convos-agent-${agentId}`);
+    console.log(`[pool] Renamed ${instance.id} → convos-agent-${agentId}`);
   } catch (err) {
     console.warn(`[pool] Failed to rename ${instance.id}:`, err.message);
   }

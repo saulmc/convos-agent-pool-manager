@@ -7,7 +7,7 @@ async function migrate() {
       railway_service_id TEXT NOT NULL,
       railway_url TEXT,
       status TEXT NOT NULL DEFAULT 'provisioning',
-      claimed_by_concierge_id TEXT,
+      claimed_by TEXT,
       claimed_at TIMESTAMPTZ,
       invite_url TEXT,
       conversation_id TEXT,
@@ -19,6 +19,19 @@ async function migrate() {
   await sql`
     CREATE INDEX IF NOT EXISTS idx_pool_instances_status
     ON pool_instances (status)
+  `;
+
+  // Rename column if upgrading from older schema
+  await sql`
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'pool_instances' AND column_name = 'claimed_by_concierge_id'
+      ) THEN
+        ALTER TABLE pool_instances RENAME COLUMN claimed_by_concierge_id TO claimed_by;
+      END IF;
+    END $$
   `;
 
   console.log("Migration complete.");
