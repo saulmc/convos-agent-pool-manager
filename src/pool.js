@@ -13,6 +13,7 @@ function instanceEnvVars() {
     POOL_AUTH_CHOICE: process.env.POOL_AUTH_CHOICE || "apiKey",
     ANTHROPIC_API_KEY: process.env.INSTANCE_ANTHROPIC_API_KEY || "",
     XMTP_ENV: process.env.INSTANCE_XMTP_ENV || "dev",
+    LINK_PREFIX: process.env.INSTANCE_LINK_PREFIX || "https://dev.convos.org",
     SETUP_PASSWORD: process.env.INSTANCE_SETUP_PASSWORD || "pool-managed",
     PORT: "8080",
   };

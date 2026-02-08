@@ -59,6 +59,7 @@ cp .env.example .env
 | `RAILWAY_SOURCE_REPO` | GitHub repo to deploy (e.g. `saulmc/clawdbot-railway-template`) |
 | `INSTANCE_ANTHROPIC_API_KEY` | Anthropic API key injected into each instance |
 | `INSTANCE_XMTP_ENV` | XMTP environment (`dev` or `production`) |
+| `INSTANCE_LINK_PREFIX` | Invite link prefix (default `https://dev.convos.org`) |
 | `POOL_MIN_IDLE` | Minimum idle instances to maintain (default `3`) |
 | `POOL_MAX_TOTAL` | Maximum total instances (default `10`) |
 | `DATABASE_URL` | Neon Postgres connection string |
