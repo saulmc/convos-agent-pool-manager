@@ -93,46 +93,105 @@ app.get("/", (_req, res) => {
       margin: 0 auto;
     }
 
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 32px;
-    }
-
     .logo-text {
       font-size: 20px;
       font-weight: 700;
       letter-spacing: -0.5px;
+      margin-bottom: 24px;
     }
 
-    .status-pills {
+    /* Pool bar */
+    .pool-bar {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #FAFAFA;
+      border: 1px solid #EBEBEB;
+      border-radius: 14px;
+      margin-bottom: 24px;
     }
 
-    .status-pill {
+    .pool-bar-left {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 6px 12px;
-      background: #F5F5F5;
-      border-radius: 20px;
-      color: #666;
     }
 
-    .status-pill .dot {
-      width: 8px;
-      height: 8px;
+    .pool-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+    }
+
+    .pool-stat {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 4px 10px;
+      background: #FFF;
+      border-radius: 8px;
+      color: #666;
+      border: 1px solid #EBEBEB;
+    }
+
+    .pool-stat .dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
     }
 
-    .status-pill.idle .dot { background: #34C759; }
-    .status-pill.provisioning .dot { background: #FF9500; }
-    .status-pill.claimed .dot { background: #007AFF; }
+    .pool-stat.ready .dot { background: #34C759; }
+    .pool-stat.starting .dot { background: #FF9500; }
 
+    .pool-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pool-bar-right input {
+      width: 48px;
+      padding: 5px 4px;
+      font-size: 13px;
+      text-align: center;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      font-family: inherit;
+      color: #000;
+      background: #FFF;
+    }
+
+    .pool-bar-right input:focus { outline: none; border-color: #999; }
+
+    .pool-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #FFF;
+      color: #666;
+      transition: all 0.15s ease;
+    }
+
+    .pool-btn:hover { background: #F5F5F5; border-color: #CCC; }
+    .pool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .pool-btn.danger {
+      color: #DC2626;
+      border-color: #FECACA;
+    }
+
+    .pool-btn.danger:hover { background: #FEF2F2; }
+
+    /* Launch card */
     .card {
       background: #FFF;
       border: 1px solid #EBEBEB;
@@ -244,13 +303,25 @@ app.get("/", (_req, res) => {
     }
 
     /* Agent feed */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 32px 0 16px;
+    }
+
     .section-title {
       font-size: 14px;
       font-weight: 600;
       color: #666;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin: 32px 0 16px;
+    }
+
+    .live-count {
+      font-size: 13px;
+      font-weight: 500;
+      color: #999;
     }
 
     .agent-card {
@@ -385,14 +456,20 @@ app.get("/", (_req, res) => {
 </head>
 <body>
   <div class="container">
-    <header class="header">
-      <span class="logo-text">Convos Agent Pool</span>
-      <div class="status-pills">
-        <div class="status-pill idle"><span class="dot"></span><span id="s-idle">-</span> idle</div>
-        <div class="status-pill provisioning"><span class="dot"></span><span id="s-prov">-</span> starting</div>
-        <div class="status-pill claimed"><span class="dot"></span><span id="s-claim">-</span> live</div>
+    <div class="logo-text">Convos Agent Pool</div>
+
+    <div class="pool-bar">
+      <div class="pool-bar-left">
+        <span class="pool-bar-label">Pool</span>
+        <div class="pool-stat ready"><span class="dot"></span><span id="s-idle">-</span> ready</div>
+        <div class="pool-stat starting"><span class="dot"></span><span id="s-prov">-</span> starting</div>
       </div>
-    </header>
+      <div class="pool-bar-right">
+        <input id="replenish-count" type="number" min="1" max="20" value="3" />
+        <button class="pool-btn" id="replenish-btn">+ Add</button>
+        <button class="pool-btn danger" id="drain-btn">Drain</button>
+      </div>
+    </div>
 
     <div class="card">
       <h3>Launch an Agent</h3>
@@ -402,12 +479,12 @@ app.get("/", (_req, res) => {
             <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
           </circle>
         </svg>
-        No idle instances available. Waiting for instances to start...
+        No instances ready. Waiting for pool to warm up...
       </div>
       <form id="f">
         <div class="setting-group">
           <label class="setting-label" for="name">Name</label>
-          <input id="name" name="name" class="setting-input" placeholder="e.g. tokyo-trip-planner" required />
+          <input id="name" name="name" class="setting-input" placeholder="e.g. Tokyo Trip" required />
         </div>
         <div class="setting-group">
           <label class="setting-label" for="instructions">Instructions</label>
@@ -418,13 +495,9 @@ app.get("/", (_req, res) => {
     </div>
     <div class="error-message" id="error"></div>
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin:32px 0 16px">
-      <span class="section-title" style="margin:0">Active Agents</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="replenish-count" type="number" min="1" max="20" value="3" class="setting-input" style="width:60px;padding:8px 12px;font-size:13px;text-align:center" />
-        <button class="btn-secondary" id="replenish-btn">Add Agents</button>
-        <button class="btn-danger" id="kill-all-btn">Kill All</button>
-      </div>
+    <div class="section-header">
+      <span class="section-title">Live Agents</span>
+      <span class="live-count" id="live-count"></span>
     </div>
     <div id="feed"></div>
   </div>
@@ -459,17 +532,18 @@ app.get("/", (_req, res) => {
       return '<1m';
     }
 
-    // Status pills
-    const sIdle=document.getElementById('s-idle'),sProv=document.getElementById('s-prov'),sClaim=document.getElementById('s-claim');
+    // Pool status
+    const sIdle=document.getElementById('s-idle'),sProv=document.getElementById('s-prov');
     const unavail=document.getElementById('unavailable'),btn=document.getElementById('btn');
-    let claiming=false;
+    const liveCount=document.getElementById('live-count');
+    let launching=false;
 
     async function refreshStatus(){
       try{
         var res=await fetch('/api/pool/counts');
         var c=await res.json();
-        sIdle.textContent=c.idle;sProv.textContent=c.provisioning;sClaim.textContent=c.claimed;
-        if(!claiming){
+        sIdle.textContent=c.idle;sProv.textContent=c.provisioning;
+        if(!launching){
           if(c.idle>0){btn.disabled=false;unavail.style.display='none'}
           else{btn.disabled=true;unavail.style.display='block'}
         }
@@ -489,8 +563,9 @@ app.get("/", (_req, res) => {
     }
 
     function renderFeed(){
+      liveCount.textContent=agentsCache.length?agentsCache.length+' running':'';
       if(!agentsCache.length){
-        feed.innerHTML='<div class="empty-state">No active agents yet. Launch one above.</div>';
+        feed.innerHTML='<div class="empty-state">No live agents yet. Launch one above.</div>';
         return;
       }
       feed.innerHTML=agentsCache.map(function(a){
@@ -574,7 +649,7 @@ app.get("/", (_req, res) => {
     f.onsubmit=async function(e){
       e.preventDefault();
       var agentName=f.name.value.trim();
-      claiming=true;btn.disabled=true;btn.textContent='Launching...';errorEl.style.display='none';
+      launching=true;btn.disabled=true;btn.textContent='Launching...';errorEl.style.display='none';
       try{
         var res=await fetch('/api/pool/claim',{method:'POST',headers:authHeaders,
           body:JSON.stringify({agentId:agentName,instructions:f.instructions.value.trim()})
@@ -587,15 +662,15 @@ app.get("/", (_req, res) => {
       }catch(err){
         errorEl.textContent=err.message;
         errorEl.style.display='block';
-      }finally{claiming=false;btn.textContent='Launch Agent';refreshStatus();}
+      }finally{launching=false;btn.textContent='Launch Agent';refreshStatus();}
     };
 
-    // Replenish
+    // Pool controls
     var replenishBtn=document.getElementById('replenish-btn');
     var replenishCount=document.getElementById('replenish-count');
     replenishBtn.onclick=async function(){
       var n=parseInt(replenishCount.value)||3;
-      replenishBtn.disabled=true;replenishBtn.textContent='Creating '+n+'...';
+      replenishBtn.disabled=true;replenishBtn.textContent='Adding...';
       try{
         var res=await fetch('/api/pool/replenish',{method:'POST',headers:authHeaders,
           body:JSON.stringify({count:n})
@@ -604,22 +679,22 @@ app.get("/", (_req, res) => {
         if(!res.ok)throw new Error(data.error||'Failed');
         refreshStatus();
       }catch(err){
-        alert('Replenish failed: '+err.message);
-      }finally{replenishBtn.disabled=false;replenishBtn.textContent='Add Agents';}
+        alert('Failed to add instances: '+err.message);
+      }finally{replenishBtn.disabled=false;replenishBtn.textContent='+ Add';}
     };
 
-    // Kill all — mark all cards as destroying, fire deletes in parallel
-    document.getElementById('kill-all-btn').onclick=async function(){
-      if(!agentsCache.length){alert('No active agents to kill.');return;}
-      if(!confirm('Are you sure you want to kill ALL '+agentsCache.length+' agents? This cannot be undone.'))return;
-      this.disabled=true;this.textContent='Killing all...';
+    // Drain — kill all live agents in parallel
+    document.getElementById('drain-btn').onclick=async function(){
+      if(!agentsCache.length){alert('No live agents to drain.');return;}
+      if(!confirm('Drain all '+agentsCache.length+' live agents? This will destroy their Railway services permanently.'))return;
+      this.disabled=true;this.textContent='Draining...';
       var ids=agentsCache.map(function(a){return a.id;});
       ids.forEach(markDestroying);
       var results=await Promise.allSettled(ids.map(killOne));
       var failed=results.filter(function(r){return r.status==='rejected';});
-      if(failed.length)alert(failed.length+' agent(s) failed to kill.');
+      if(failed.length)alert(failed.length+' agent(s) failed to drain.');
       refreshFeed();refreshStatus();
-      this.disabled=false;this.textContent='Kill All';
+      this.disabled=false;this.textContent='Drain';
     };
 
     // Initial load + polling
