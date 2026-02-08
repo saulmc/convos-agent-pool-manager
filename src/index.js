@@ -43,6 +43,26 @@ app.get("/api/pool/agents", async (_req, res) => {
   }
 });
 
+// Kill all claimed instances
+app.delete("/api/pool/instances", requireAuth, async (_req, res) => {
+  try {
+    const agents = await db.listClaimed();
+    let killed = 0;
+    for (const a of agents) {
+      try {
+        await pool.killInstance(a.id);
+        killed++;
+      } catch (err) {
+        console.error(`[api] Failed to kill ${a.id}:`, err.message);
+      }
+    }
+    res.json({ ok: true, killed });
+  } catch (err) {
+    console.error("[api] Kill all failed:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Kill a claimed instance
 app.delete("/api/pool/instances/:id", requireAuth, async (req, res) => {
   try {
@@ -394,6 +414,7 @@ app.get("/", (_req, res) => {
       <div style="display:flex;gap:8px;align-items:center">
         <input id="replenish-count" type="number" min="1" max="20" value="3" class="setting-input" style="width:60px;padding:8px 12px;font-size:13px;text-align:center" />
         <button class="btn-secondary" id="replenish-btn">Add Agents</button>
+        <button class="btn-danger" id="kill-all-btn">Kill All</button>
       </div>
     </div>
     <div id="feed"></div>
@@ -560,6 +581,21 @@ app.get("/", (_req, res) => {
       }catch(err){
         alert('Replenish failed: '+err.message);
       }finally{replenishBtn.disabled=false;replenishBtn.textContent='Add Agents';}
+    };
+
+    // Kill all
+    document.getElementById('kill-all-btn').onclick=async function(){
+      if(!agentsCache.length){alert('No active agents to kill.');return;}
+      if(!confirm('Are you sure you want to kill ALL '+agentsCache.length+' agents? This cannot be undone.'))return;
+      this.disabled=true;this.textContent='Killing all...';
+      try{
+        var res=await fetch('/api/pool/instances',{method:'DELETE',headers:authHeaders});
+        var data=await res.json();
+        if(!res.ok)throw new Error(data.error||'Failed');
+        refreshFeed();refreshStatus();
+      }catch(err){
+        alert('Kill all failed: '+err.message);
+      }finally{this.disabled=false;this.textContent='Kill All';}
     };
 
     // Initial load + polling
