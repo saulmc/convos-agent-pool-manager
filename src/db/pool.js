@@ -75,6 +75,16 @@ export async function listAll() {
   return result.rows;
 }
 
+export async function findIdle() {
+  const result = await sql`
+    SELECT * FROM pool_instances
+    WHERE status = 'idle'
+    ORDER BY created_at ASC
+    LIMIT 1
+  `;
+  return result.rows[0] || null;
+}
+
 export async function deleteInstance(id) {
   await sql`DELETE FROM pool_instances WHERE id = ${id}`;
 }
