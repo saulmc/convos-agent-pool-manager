@@ -97,7 +97,7 @@ app.get("/", (_req, res) => {
       margin: 0 auto;
     }
 
-    /* Header — matches /setup */
+    /* Header */
     .header {
       display: flex;
       align-items: center;
@@ -115,6 +115,12 @@ app.get("/", (_req, res) => {
       font-size: 20px;
       font-weight: 700;
       letter-spacing: -0.5px;
+    }
+
+    .logo-sub {
+      font-size: 13px;
+      color: #999;
+      font-weight: 400;
     }
 
     .header-right {
@@ -145,12 +151,104 @@ app.get("/", (_req, res) => {
     .status-badge.starting .dot { background: #FF9500; }
     .status-badge.claimed .dot { background: #007AFF; }
 
-    /* Two-column grid — matches /setup */
+    /* Pool bar */
+    .pool-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #FAFAFA;
+      border: 1px solid #EBEBEB;
+      border-radius: 14px;
+      margin-bottom: 24px;
+    }
+
+    .pool-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pool-bar-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 6px;
+    }
+
+    .pool-stat {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 4px 10px;
+      background: #FFF;
+      border-radius: 8px;
+      color: #666;
+      border: 1px solid #EBEBEB;
+    }
+
+    .pool-stat .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .pool-stat.ready .dot { background: #34C759; }
+    .pool-stat.starting .dot { background: #FF9500; }
+    .pool-stat.claimed .dot { background: #007AFF; }
+
+    .pool-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pool-bar-right input {
+      width: 48px;
+      padding: 5px 4px;
+      font-size: 13px;
+      text-align: center;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      font-family: inherit;
+      color: #000;
+      background: #FFF;
+    }
+
+    .pool-bar-right input:focus { outline: none; border-color: #999; }
+
+    .pool-btn {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border: 1px solid #EBEBEB;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #FFF;
+      color: #666;
+      transition: all 0.15s ease;
+    }
+
+    .pool-btn:hover { background: #F5F5F5; border-color: #CCC; }
+    .pool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .pool-btn.danger {
+      color: #DC2626;
+      border-color: #FECACA;
+    }
+
+    .pool-btn.danger:hover { background: #FEF2F2; }
+
+    /* Two-column grid */
     .main-content {
       display: grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 340px;
       gap: 24px;
-      margin-bottom: 24px;
+      align-items: start;
     }
 
     @media (max-width: 768px) {
@@ -332,97 +430,17 @@ app.get("/", (_req, res) => {
       display: none;
     }
 
-    /* Pool controls sidebar */
-    .pool-controls-card {
+    /* Agent feed (right column) */
+    .feed-column {
       display: flex;
       flex-direction: column;
-      gap: 20px;
     }
 
-    .pool-info {
-      padding: 16px 20px;
-      background: #F5F5F5;
-      border-radius: 16px;
-    }
-
-    .pool-info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #EBEBEB;
-    }
-
-    .pool-info-row:last-child {
-      border-bottom: none;
-    }
-
-    .pool-info-label {
-      font-size: 12px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .pool-info-value {
-      font-size: 14px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-    }
-
-    .pool-info-value.ready {
-      background: #D4EDDA;
-      color: #155724;
-    }
-
-    .pool-info-value.starting {
-      background: #FFF3CD;
-      color: #856404;
-    }
-
-    .pool-info-value.active {
-      background: #D1ECF1;
-      color: #0C5460;
-    }
-
-    .pool-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .pool-action-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .pool-action-row input {
-      width: 56px;
-      padding: 8px 4px;
-      font-size: 14px;
-      text-align: center;
-      border: 1px solid #EBEBEB;
-      border-radius: 12px;
-      font-family: inherit;
-      color: #000;
-      background: #FFF;
-    }
-
-    .pool-action-row input:focus { outline: none; border-color: #000; }
-
-    .pool-action-row .btn-secondary {
-      flex: 1;
-    }
-
-    /* Agent feed */
     .section-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: 32px 0 16px;
+      margin-bottom: 16px;
     }
 
     .section-title {
@@ -442,35 +460,35 @@ app.get("/", (_req, res) => {
     .agent-card {
       background: #FFF;
       border: 1px solid #EBEBEB;
-      border-radius: 24px;
-      padding: 24px 28px;
-      margin-bottom: 12px;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 10px;
     }
 
     .agent-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .agent-name {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       letter-spacing: -0.08px;
     }
 
     .agent-uptime {
-      font-size: 13px;
+      font-size: 12px;
       color: #999;
       font-weight: 500;
     }
 
     .agent-instructions {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
-      line-height: 1.5;
-      margin-bottom: 16px;
+      line-height: 1.4;
+      margin-bottom: 12px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -479,7 +497,14 @@ app.get("/", (_req, res) => {
 
     .agent-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
+    }
+
+    .agent-actions .btn-secondary,
+    .agent-actions .btn-danger {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 8px;
     }
 
     .agent-card.destroying {
@@ -563,9 +588,9 @@ app.get("/", (_req, res) => {
 
     .empty-state {
       text-align: center;
-      padding: 40px 16px;
+      padding: 32px 16px;
       color: #999;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     @media (max-width: 768px) {
@@ -580,6 +605,20 @@ app.get("/", (_req, res) => {
         flex-wrap: wrap;
         gap: 6px;
       }
+
+      .pool-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .pool-bar-left {
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .pool-bar-right {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -588,7 +627,7 @@ app.get("/", (_req, res) => {
     <header class="header">
       <div class="logo-container">
         <span class="logo-text">Convos Agent Pool</span>
-        <span style="font-size:13px;color:#999;font-weight:400;letter-spacing:0;">Quickly spin up agents and iterate on instructions</span>
+        <span class="logo-sub">Internal tool for quickly spinning up agents with new instructions.</span>
       </div>
       <div class="header-right">
         <div class="status-badge ready"><span class="dot"></span><span id="s-idle">-</span> ready</div>
@@ -596,6 +635,20 @@ app.get("/", (_req, res) => {
         <div class="status-badge claimed"><span class="dot"></span><span id="s-alloc">-</span> claimed</div>
       </div>
     </header>
+
+    <div class="pool-bar">
+      <div class="pool-bar-left">
+        <span class="pool-bar-label">Pool</span>
+        <div class="pool-stat ready"><span class="dot"></span><span id="s-idle2">-</span> ready</div>
+        <div class="pool-stat starting"><span class="dot"></span><span id="s-prov2">-</span> starting</div>
+        <div class="pool-stat claimed"><span class="dot"></span><span id="s-alloc2">-</span> claimed</div>
+      </div>
+      <div class="pool-bar-right">
+        <input id="replenish-count" type="number" min="1" max="20" value="3" />
+        <button class="pool-btn" id="replenish-btn">+ Add</button>
+        <button class="pool-btn danger" id="drain-btn">Drain</button>
+      </div>
+    </div>
 
     <div class="main-content">
       <div class="card">
@@ -640,39 +693,14 @@ app.get("/", (_req, res) => {
         </div>
       </div>
 
-      <div class="card pool-controls-card">
-        <h3>Pool Controls</h3>
-        <div class="pool-info">
-          <div class="pool-info-row">
-            <span class="pool-info-label">Ready</span>
-            <span class="pool-info-value ready" id="s-idle2">-</span>
-          </div>
-          <div class="pool-info-row">
-            <span class="pool-info-label">Starting</span>
-            <span class="pool-info-value starting" id="s-prov2">-</span>
-          </div>
-          <div class="pool-info-row">
-            <span class="pool-info-label">Claimed</span>
-            <span class="pool-info-value active" id="s-alloc2">-</span>
-          </div>
+      <div class="feed-column">
+        <div class="section-header">
+          <span class="section-title">Live Agents</span>
+          <span class="live-count" id="live-count"></span>
         </div>
-        <div class="pool-actions">
-          <div class="pool-action-row">
-            <input id="replenish-count" type="number" min="1" max="20" value="3" />
-            <button class="btn-secondary" id="replenish-btn">+ Add</button>
-          </div>
-          <div class="pool-action-row">
-            <button class="btn-danger" id="drain-btn" style="flex:1">Drain Idle</button>
-          </div>
-        </div>
+        <div id="feed"></div>
       </div>
     </div>
-
-    <div class="section-header">
-      <span class="section-title">Live Agents</span>
-      <span class="live-count" id="live-count"></span>
-    </div>
-    <div id="feed"></div>
   </div>
 
   <div class="modal-overlay" id="qr-modal">
