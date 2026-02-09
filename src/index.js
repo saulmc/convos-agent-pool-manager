@@ -606,9 +606,9 @@ app.get("/", (_req, res) => {
     <div class="pool-bar">
       <div class="pool-bar-left">
         <span class="pool-bar-label">Pool</span>
-        <div class="pool-stat ready"><span class="dot"></span><span id="s-idle2">-</span> ready</div>
-        <div class="pool-stat starting"><span class="dot"></span><span id="s-prov2">-</span> starting</div>
-        <div class="pool-stat claimed"><span class="dot"></span><span id="s-alloc2">-</span> claimed</div>
+        <div class="pool-stat ready"><span class="dot"></span><span id="s-idle">-</span> ready</div>
+        <div class="pool-stat starting"><span class="dot"></span><span id="s-prov">-</span> starting</div>
+        <div class="pool-stat claimed"><span class="dot"></span><span id="s-alloc">-</span> claimed</div>
       </div>
       <div class="pool-bar-right">
         <input id="replenish-count" type="number" min="1" max="20" value="3" />
@@ -701,7 +701,7 @@ app.get("/", (_req, res) => {
     }
 
     // Pool status
-    const sIdle=document.getElementById('s-idle2'),sProv=document.getElementById('s-prov2'),sAlloc=document.getElementById('s-alloc2');
+    const sIdle=document.getElementById('s-idle'),sProv=document.getElementById('s-prov'),sAlloc=document.getElementById('s-alloc');
     const unavail=document.getElementById('unavailable'),btn=document.getElementById('btn');
     const liveCount=document.getElementById('live-count');
     let launching=false;
